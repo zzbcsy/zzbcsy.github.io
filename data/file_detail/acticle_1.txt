@@ -1,5 +1,5 @@
 
-> 网址：https://github.com/SDWebImage/SDWebImage
+ 
 Github:[https://github.com/SDWebImage/SDWebImage](https://github.com/SDWebImage/SDWebImage)
 
 #### 一、流程
@@ -145,9 +145,8 @@ Github:[https://github.com/SDWebImage/SDWebImage](https://github.com/SDWebImage/
   也可自定义文件名
 ~~~
 
-#### 十二、SDWebImage Disk目录位于哪里？
+#### 十二、SDWebImage 中的工具类介绍
 ~~~
-SDWebImage 中的工具类介绍
   1、NSData+ImageContentType: 根据图片数据获取图片的类型，比如GIF、PNG等。
   2、SDWebImageCompat: 根据屏幕的分辨倍数成倍放大或者缩小图片大小。
   3、SDImageCacheConfig:图片缓存策略记录。比如是否解压缩、是否允许iCloud、是否允许内存缓存、缓存时间等。默认的缓存时间是一周。
