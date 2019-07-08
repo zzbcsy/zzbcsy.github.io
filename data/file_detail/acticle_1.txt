@@ -1,9 +1,9 @@
-#### SDWebImage
 
 > 网址：https://github.com/SDWebImage/SDWebImage
+Github:[https://github.com/SDWebImage/SDWebImage](https://github.com/SDWebImage/SDWebImage)
 
+#### 一、流程
 ~~~
-流程:
 给UIImageView设置图片
 |
 |->取消对应的UIImageView的图片相关操作
@@ -29,8 +29,9 @@
                         |->设置图片到对应控件
                         
 ~~~
+
+#### 二、SDWebImage中@autoreleasepool的应用（自动释放池）：
 ~~~
-SDWebImage中@autoreleasepool的应用（自动释放池）：
   采用：@autoreleasepool利于局部变量立刻释放。
   比如
   如下代码在主线程下会不断创建，内存不断提高。
@@ -45,8 +46,10 @@ SDWebImage中@autoreleasepool的应用（自动释放池）：
       }        
   }
 ~~~
+
+#### 第三、SDWebImage 支持GIF动图吗？支持
 ~~~
-SDWebImage 支持GIF动图吗？支持
+
   SDWebImage 4.0版本之前的UIImage+GIF类别：
   @interface UIImage (GIF)
   + (IImage *)sd_animatedGIFNamed:(NSString *)name;
@@ -59,12 +62,14 @@ SDWebImage 支持GIF动图吗？支持
   - (BOOL)isGIF;
   @end
 ~~~
+
+#### 四、SDWebImage 缓存图片的名称如何避免重名：
 ~~~
-SDWebImage 缓存图片的名称如何避免重名：
   对『绝对路径』进行MD5
 ~~~
+
+#### 五、SDWebImage 如何保证UI操作放在主线程中执行？
 ~~~
-SDWebImage 如何保证UI操作放在主线程中执行？
   #ifndef dispatch_main_async_safe
   #define dispatch_main_async_safe(block)\
       if (strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), dispatch_queue_get_label(dispatch_get_main_queue())) == 0) {\
@@ -81,14 +86,16 @@ SDWebImage 如何保证UI操作放在主线程中执行？
           dispatch_async(dispatch_get_main_queue(), block);\
       }
 ~~~
+
+#### 六、SDWebImage的最大并发数和超时时长
 ~~~    
-SDWebImage的最大并发数和超时时长
   // SDWebImageDownloader.m   -initWithSessionConfiguration:
   _downloadQueue.maxConcurrentOperationCount = 6;
   _downloadTimeout = 15.0;
 ~~~
+
+#### 七、SDWebImage 的Memory缓存和Disk缓存是用什么实现的？
 ~~~
-SDWebImage 的Memory缓存和Disk缓存是用什么实现的？
 1、Memory缓存实现 -- AutoPurgeCache类(继承自NSCache)。
    内存紧张时候释放缓存的能力。
    自动删除机制：当系统内存紧张时，NSCache 会自动删除一些缓存对象。
@@ -101,22 +108,25 @@ SDWebImage 的Memory缓存和Disk缓存是用什么实现的？
   1、读取Memory：NScache是线程安全的，在多线程操作中，不需要对Cache加锁。
   2、读取Disk：创建了一个名为IO的串行队列，所有Disk操作都在此队列中，逐个执行！
 ~~~
+
+#### 八、SD使用 @synchronized
 ~~~
-SD使用 @synchronized
   @synchronized (self.failedURLs) {
       isFailedUrl = [self.failedURLs containsObject:url];
   }
   结论：所有可能引起资源抢夺的对象操作、全部有条件锁保护。
   使用@synchronized来使得代码获得原子性，从而保证多线程安全。
 ~~~
+
+#### 九、SDWebImage 的Memory警告是如何处理的！
 ~~~
-SDWebImage 的Memory警告是如何处理的！
   利用通知中心观察
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clearMemory)  name: UIApplicationDidReceiveMemoryWarningNotification object:nil];
   执行 clearMemory 方法，清理内存缓存！
 ~~~
+
+#### 十、SDWebImage Disk缓存时长？ Disk清理操作时间点？ Disk清理原则？
 ~~~
-SDWebImage Disk缓存时长？ Disk清理操作时间点？ Disk清理原则？
   默认为一周
   磁盘清理时间点
   [[NSNotificationCenter defaultCenter] addObserver:self
@@ -127,12 +137,15 @@ SDWebImage Disk缓存时长？ Disk清理操作时间点？ Disk清理原则？
    name:UIApplicationDidEnterBackgroundNotification object:nil];
   分别在『应用被杀死时』和 『应用进入后台时』进行清理操作
 ~~~
+
+#### 十一、SDWebImage Disk目录位于哪里？
 ~~~
-SDWebImage Disk目录位于哪里？
   缓存在沙盒目录下 Library/Caches
   默认情况下，二级目录为 ~/Library/Caches/default/com.hackemist.SDWebImageCache.default
   也可自定义文件名
 ~~~
+
+#### 十二、SDWebImage Disk目录位于哪里？
 ~~~
 SDWebImage 中的工具类介绍
   1、NSData+ImageContentType: 根据图片数据获取图片的类型，比如GIF、PNG等。
