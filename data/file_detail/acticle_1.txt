@@ -1,3 +1,145 @@
+#### SDWebImage
 
-### 第1篇标题
+> 网址：https://github.com/SDWebImage/SDWebImage
+
+~~~
+流程:
+给UIImageView设置图片
+|
+|->取消对应的UIImageView的图片相关操作
+   |
+   |->欲加我的图片URL是否为空?
+      |
+      |->（空）出错处理
+      |
+      |->（不空）生成图片URL对应的Key
+         |
+         |->生成图片URL对应key
+            |
+            |->使用key读取内存和磁盘缓存
+               |
+               |->是否缓存?
+                  |
+                  |->（有）读取图片，设置到对应控件
+                  |
+                  |->（无）下载图片，图片处理
+                     |
+                     |->图片保存缓存
+                        |
+                        |->设置图片到对应控件
+                        
+~~~
+~~~
+SDWebImage中@autoreleasepool的应用（自动释放池）：
+  采用：@autoreleasepool利于局部变量立刻释放。
+  比如
+  如下代码在主线程下会不断创建，内存不断提高。
+  等到for循环之后在释放，内存又不断下降。
+  for (int i = 0; i < 10000; i++) {
+      [self doSthWith:object];
+  }
+  如下局部自动释放池就会存在一边存储，一边释放。
+  for (int i = 0; i < 1000000; i++) {
+      @autoreleasepool {
+          [self doSthWith:object];
+      }        
+  }
+~~~
+~~~
+SDWebImage 支持GIF动图吗？支持
+  SDWebImage 4.0版本之前的UIImage+GIF类别：
+  @interface UIImage (GIF)
+  + (IImage *)sd_animatedGIFNamed:(NSString *)name;
+  + (UIImage *)sd_animatedGIFWithData:(NSData *)data;
+  - (UIImage *)sd_animatedImageByScalingAndCroppingToSize:(CGSize)size;
+  @end
+  SDWebImage 4.0版本之后的UIImage+GIF类别：
+  @interface UIImage (GIF)
+  + (UIImage *)sd_animatedGIFWithData:(NSData *)data;
+  - (BOOL)isGIF;
+  @end
+~~~
+~~~
+SDWebImage 缓存图片的名称如何避免重名：
+  对『绝对路径』进行MD5
+~~~
+~~~
+SDWebImage 如何保证UI操作放在主线程中执行？
+  #ifndef dispatch_main_async_safe
+  #define dispatch_main_async_safe(block)\
+      if (strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), dispatch_queue_get_label(dispatch_get_main_queue())) == 0) {\
+          block();\
+      } else {\
+          dispatch_async(dispatch_get_main_queue(), block);\
+      }
+  #endif
+之前
+  #define dispatch_main_async_safe(block)\
+      if ([NSThread isMainThread]) {\
+          block();\
+      } else {\
+          dispatch_async(dispatch_get_main_queue(), block);\
+      }
+~~~
+~~~    
+SDWebImage的最大并发数和超时时长
+  // SDWebImageDownloader.m   -initWithSessionConfiguration:
+  _downloadQueue.maxConcurrentOperationCount = 6;
+  _downloadTimeout = 15.0;
+~~~
+~~~
+SDWebImage 的Memory缓存和Disk缓存是用什么实现的？
+1、Memory缓存实现 -- AutoPurgeCache类(继承自NSCache)。
+   内存紧张时候释放缓存的能力。
+   自动删除机制：当系统内存紧张时，NSCache 会自动删除一些缓存对象。
+   线程安全：从不同线程中对同一个 NSCache 对象进行增删改查时，不需要加锁。
+   同于 NSMutableDictionary、NSCache存储对象时不会对 key 进行 copy 操作。
+2、Disk缓存实现 -- NSFileManager
+   SDImageCache 的磁盘缓存是通过异步操作 NSFileManager 存储缓存文件到沙盒来实现的。
+
+读取Memory和Disk的时候如何保证线程安全？
+  1、读取Memory：NScache是线程安全的，在多线程操作中，不需要对Cache加锁。
+  2、读取Disk：创建了一个名为IO的串行队列，所有Disk操作都在此队列中，逐个执行！
+~~~
+~~~
+SD使用 @synchronized
+  @synchronized (self.failedURLs) {
+      isFailedUrl = [self.failedURLs containsObject:url];
+  }
+  结论：所有可能引起资源抢夺的对象操作、全部有条件锁保护。
+  使用@synchronized来使得代码获得原子性，从而保证多线程安全。
+~~~
+~~~
+SDWebImage 的Memory警告是如何处理的！
+  利用通知中心观察
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clearMemory)  name: UIApplicationDidReceiveMemoryWarningNotification object:nil];
+  执行 clearMemory 方法，清理内存缓存！
+~~~
+~~~
+SDWebImage Disk缓存时长？ Disk清理操作时间点？ Disk清理原则？
+  默认为一周
+  磁盘清理时间点
+  [[NSNotificationCenter defaultCenter] addObserver:self
+    selector:@selector(deleteOldFiles)
+   name:UIApplicationWillTerminateNotification  object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+  selector:@selector(backgroundDeleteOldFiles)
+   name:UIApplicationDidEnterBackgroundNotification object:nil];
+  分别在『应用被杀死时』和 『应用进入后台时』进行清理操作
+~~~
+~~~
+SDWebImage Disk目录位于哪里？
+  缓存在沙盒目录下 Library/Caches
+  默认情况下，二级目录为 ~/Library/Caches/default/com.hackemist.SDWebImageCache.default
+  也可自定义文件名
+~~~
+~~~
+SDWebImage 中的工具类介绍
+  1、NSData+ImageContentType: 根据图片数据获取图片的类型，比如GIF、PNG等。
+  2、SDWebImageCompat: 根据屏幕的分辨倍数成倍放大或者缩小图片大小。
+  3、SDImageCacheConfig:图片缓存策略记录。比如是否解压缩、是否允许iCloud、是否允许内存缓存、缓存时间等。默认的缓存时间是一周。
+  4、UIImage+MultiFormat:获取UIImage对象对应的data、或者根据data生成指定格式的UIImage，其实就是UIImage和NSData之间的转换处理。
+  5、UIImage+GIF: 对于一张图片是否GIF做判断。可以根据NSData返回一张GIF的UIImage对象，并且只返回GIF的第一张图片生成的GIF。如果要显示多张GIF，使用FLAnimatedImageView。
+  6、SDWebImageDecoder:根据图片的情况，做图片的解压缩处理。并且根据图片的情况决定如何处理解压缩。
+~~~
 
