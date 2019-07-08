@@ -1,4 +1,4 @@
 [
 {"id": 1, "title": "iOS第三方框架SDWebImage", "category": "iOS", "time": "2019.07.07 22:08", "url": "file_detail/acticle_1.txt"},
-{"id": 2, "title": "第2篇标题JAVA", "category": "JAVA", "time": "2018.08.02 10:11", "url": "file_detail/acticle_2.txt"}
+{"id": 2, "title": "有名公司的Github库,值得你学习", "category": "Other", "time": "2018.08.02 10:11", "url": "file_detail/acticle_2.txt"}
 ]
