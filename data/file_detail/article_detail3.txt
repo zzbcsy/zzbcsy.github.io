@@ -1,0 +1,44 @@
+#### Code4App
+```
+http://code4app.com
+```
+
+#### 123.th7.c
+```
+http://123.th7.cn/list/list_6_2.html
+```
+
+#### 662P开源网
+```
+http://code.662p.com/list/2892_1.html
+```
+
+#### oschina iOS开发专区
+```
+http://www.oschina.net/ios/codingList/375/ios-switch?sort=view
+```
+
+#### cocoachina 代码库
+```
+http://code.cocoachina.com/view/125466
+```
+
+#### CSDN个人博客
+```
+http://blog.csdn.net/xn4545945/article/details/38962669
+```
+
+#### iOS开发 非常全的三方库、插件、大牛博客等等
+```
+https://blog.csdn.net/u014068781/article/details/52484821
+```
+
+#### github个人社区
+```
+https://github.com/trending?l=swift&since=daily
+```
+
+#### github个人社区
+```
+http://trendingcocoapods.github.io
+```
